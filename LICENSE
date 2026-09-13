@@ -1,0 +1,70 @@
+GlowSong 星霞宋体
+=================
+
+Each part is under its own licence. Full texts are where this file says.
+
+
+Outline fonts
+-------------
+
+Directory: glowsong-base-1.000/
+Files: GlowSongBase-Regular.ttf, GlowSongGBBase-Regular.ttf,
+       GlowSongExtA-Regular.ttf, src/
+
+SIL Open Font License 1.1
+SPDX-License-Identifier: OFL-1.1
+Text: glowsong-base-1.000/LICENSE
+
+    Copyright 2026 The GlowSong Authors, with no Reserved Font Name.
+    Portions copyright 2017-2024 Adobe, with Reserved Font Name 'Source'.
+    Portions digitized data copyright 2010 Google Corporation,
+        with Reserved Font Arimo, Tinos and Cousine.
+    Portions copyright 2012 Red Hat, Inc., with Reserved Font Name Liberation.
+
+
+Bitmap fonts
+------------
+
+Directory: glowsong-bitmap-1.000/
+Files: GlowSongBitmap.otb, GlowSongGBBitmap.otb, src/
+
+GNU General Public License version 2, with the font embedding exception
+SPDX-License-Identifier: GPL-2.0-only WITH Font-exception-2.0
+Text: glowsong-bitmap-1.000/LICENSE
+
+    Copyright 2026 The GlowSong Authors.
+    Portions copyright 2004-2010 WenQuanYi Project Board of Trustees
+        and Qianqian Fang.
+    ASCII bitmaps from X.org font-misc-misc, public domain.
+
+The BDF files in src/ are the corresponding source under section 3.
+
+
+Merge tool
+----------
+
+Directory: sbitgraft-1.000/
+
+MIT
+SPDX-License-Identifier: MIT
+Text: sbitgraft-1.000/LICENSE
+
+    Copyright 2026 The GlowSong Authors.
+
+
+Configuration
+-------------
+
+Files: 65-glowsong.conf, check-fontconfig.sh
+
+CC0 1.0 Universal
+SPDX-License-Identifier: CC0-1.0
+Text: LICENSE-CC0
+
+
+Merged fonts
+------------
+
+A font produced by grafting the bitmaps onto the outlines derives from both the
+OFL and the GPL material. No single set of terms covers it, so it may be used
+but not redistributed. Redistribute the directories above instead.

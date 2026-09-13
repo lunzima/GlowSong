@@ -1,0 +1,8 @@
+# Build products, not sources.
+sbitgraft-*/sbitgraft
+sbitgraft-*/*.o
+*.ttc
+GlowSong-Regular.ttf
+GlowSongMono-Regular.ttf
+GlowSongGB-Regular.ttf
+GlowSongGBMono-Regular.ttf

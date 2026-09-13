@@ -1,0 +1,43 @@
+{
+  "_comment": "Localised family names and the legal records, keyed by PostScript name. Kept out of the source so the code stays pure ASCII. Language tags are Windows LCIDs. The monospace suffix stays ASCII 'Mono' even in the Chinese names, so that a font merged locally by sbitgraft - which cannot know the word in any other language - lands on exactly the same name table as the build here.",
+  "version": "1.000",
+  "vendor_id": "GSng",
+  "project_url": "https://github.com/lunzima/GlowSong",
+  "author": "The GlowSong Authors",
+  "_legal_comment": "name IDs 0, 13 and 14. Both upstream licences require their notice to travel with the font, so these are not decoration. Source Han Serif reserves 'Source' and Liberation reserves 'Liberation'; neither word appears anywhere in this font's names, which is what OFL clause 3 asks. The outline and bitmap sides are distributed separately and never meet in one file, so each carries only the notices of what went into it.",
+  "legal": {
+    "outline": {
+      "copyright": "Copyright 2026 The GlowSong Authors (https://github.com/lunzima/GlowSong).\nPortions copyright 2017-2024 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.\nPortions digitized data copyright 2010 Google Corporation, with Reserved Font Arimo, Tinos and Cousine.\nPortions copyright 2012 Red Hat, Inc., with Reserved Font Name Liberation.",
+      "licence": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the SIL Open Font License for the specific language, permissions and limitations governing your use of this Font Software.",
+      "licence_url": "https://openfontlicense.org"
+    },
+    "bitmap": {
+      "copyright": "Copyright 2026 The GlowSong Authors (https://github.com/lunzima/GlowSong).\nPortions copyright 2004-2010 WenQuanYi Project Board of Trustees and Qianqian Fang.\nASCII bitmaps from X.org font-misc-misc, public domain.",
+      "licence": "This Font Software is licensed under the GNU General Public License, version 2, with the font embedding exception: embedding this font in a document does not by itself place that document under the GPL. This Font Software is distributed WITHOUT ANY WARRANTY. See the licence for the specific language, permissions and limitations governing your use of this Font Software.",
+      "licence_url": "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
+    }
+  },
+  "faces": {
+    "GlowSong-Regular": {
+      "0x0804": "星霞宋体"
+    },
+    "GlowSongMono-Regular": {
+      "0x0804": "星霞宋体 Mono"
+    },
+    "GlowSongGB-Regular": {
+      "0x0804": "星霞宋体 GB"
+    },
+    "GlowSongGBMono-Regular": {
+      "0x0804": "星霞宋体 GB Mono"
+    },
+    "GlowSongExtA-Regular": {
+      "0x0804": "星霞宋体 ExtA"
+    },
+    "GlowSongBitmap-Regular": {
+      "0x0804": "星霞点阵体"
+    },
+    "GlowSongGBBitmap-Regular": {
+      "0x0804": "星霞点阵体 GB"
+    }
+  }
+}

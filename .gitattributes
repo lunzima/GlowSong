@@ -1,0 +1,8 @@
+# The shipped text is LF everywhere; a CRLF checkout would break the shell
+# script on the systems it is meant for.
+* text=auto eol=lf
+
+*.ttf binary
+*.ttc binary
+*.otb binary
+*.bdf text eol=lf

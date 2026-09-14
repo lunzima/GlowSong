@@ -56,21 +56,41 @@ check() {  # check <label> <expected substring> <actual>
 
 m() { fc-match -f '%{family[0]}' "$1" 2>/dev/null; }
 
-echo "== generic families and substitutions =="
-check serif        "GlowSong"           "$(m serif)"
-check monospace    "GlowSong Mono"      "$(m monospace)"
-check SimSun       "GlowSong"           "$(m SimSun)"
-check NSimSun      "GlowSong Mono"      "$(m NSimSun)"
-check "SimSun (zh)"  "GlowSong"         "$(m 宋体)"
-check "NSimSun (zh)" "GlowSong Mono"    "$(m 新宋体)"
+echo "== every face is found =="
+# Installing this font does not decide what the desktop's default serif is.
+# What has to work is that every face can be found and is classified, so that
+# whatever the desktop offers for choosing a font can offer these.
+for fam in "GlowSong" "GlowSong GB" "GlowSong ExtA" "GlowSong Mono" "GlowSong GB Mono"; do
+  if fc-list -f '%{family[0]}\n' 2>/dev/null | grep -qxF "$fam"; then
+    printf '  ok   %-34s listed\n' "$fam"
+  else
+    printf '  FAIL %-34s not found\n' "$fam"
+    fail=$((fail + 1))
+  fi
+done
 
-echo "== sans-serif must not resolve to a serif =="
-s=$(m sans-serif)
-case "$s" in
-  GlowSong*) printf '  FAIL %-34s resolved to %s\n' "sans-serif" "$s"
-                  fail=$((fail + 1)) ;;
-  *)              printf '  ok   %-34s %s\n' "sans-serif" "$s" ;;
-esac
+echo "== the generic families are not claimed =="
+# Reported, not asserted. This file carries no <prefer> and no strong prepend
+# for a generic, which is the whole of the promise; whether this font still
+# scores highest for one depends on fontconfig and on what else is installed.
+#
+# Matched on the opening pair rather than the bare word, so that the comment
+# explaining the absence is not mistaken for the thing itself.
+if grep -q "<prefer><family>" "$HERE/65-glowsong.conf"; then
+  printf '  FAIL %-34s the configuration claims a generic\n' "no <prefer>"
+  fail=$((fail + 1))
+else
+  printf '  ok   %-34s no <prefer> in the configuration\n' "generics not claimed"
+fi
+for generic in serif sans-serif monospace; do
+  printf '  note %-34s resolves to %s\n' "$generic" "$(m "$generic")"
+done
+
+echo "== old family names are substituted =="
+check SimSun         "GlowSong"           "$(m SimSun)"
+check NSimSun        "GlowSong Mono"      "$(m NSimSun)"
+check "SimSun (zh)"  "GlowSong"           "$(m 宋体)"
+check "NSimSun (zh)" "GlowSong Mono"      "$(m 新宋体)"
 
 echo "== bitmap switches =="
 for px in 12 13 14 15 16; do
@@ -81,6 +101,31 @@ for px in 17 20 32; do
   check "${px}px bitmaps off, AA on" "False|True" \
     "$(fc-match -f '%{embeddedbitmap}|%{antialias}' "GlowSong:pixelsize=$px")"
 done
+
+echo "== monospace classification =="
+# fontconfig works spacing out from the advances it finds, and a CJK monospace
+# face has two of them - half width and full width, exactly double. That reads
+# as FC_DUAL (90), so without the scan rule the face is missing from every
+# list a terminal or font picker builds by asking for spacing=100.
+for fam in "GlowSong Mono" "GlowSong GB Mono"; do
+  if fc-list -f '%{family[0]}\n' :spacing=100 2>/dev/null |
+       grep -qxF "$fam"; then
+    printf '  ok   %-34s listed as monospace\n' "$fam"
+  elif fc-list -f '%{family[0]}\n' 2>/dev/null | grep -qxF "$fam"; then
+    printf '  FAIL %-34s present but not spacing=100\n' "$fam"
+    fail=$((fail + 1))
+  else
+    printf '  skip %-34s not installed\n' "$fam"
+  fi
+done
+check "GlowSong Mono spacing" "100" \
+  "$(fc-match -f '%{spacing}' 'GlowSong Mono' 2>/dev/null)"
+
+echo "== hinting must use the font's own instructions =="
+# hintslight would run FreeType's autohinter and discard the bytecode above
+# 16px, which is most of the file.
+check "hintstyle is hintfull (3)" "3" \
+  "$(fc-match -f '%{hintstyle}' 'GlowSong:pixelsize=20' 2>/dev/null)"
 
 echo "== Ext A fallback =="
 check "U+3400 falls to ExtA" "GlowSong ExtA" "$(m 'GlowSong:charset=3400')"

@@ -54,9 +54,11 @@ _TABULAR = frozenset(BOX_DRAWING) | frozenset(BLOCK_ELEMENTS)
 def slim() -> frozenset[int]:
     """Slim build, GB2312 level, aimed at low-memory Linux use.
 
-    This build must *not* set the CP936 codepage bit in OS/2. It holds only
-    GB2312's 6763 characters, so claiming CP936 is a false declaration and lands
-    legacy GDI applications on tofu boxes for the GBK extensions.
+    It holds only GB2312's 6763 characters, so the CP936 codepage bit it sets in
+    OS/2 does overstate it. It sets the bit anyway, and `metrics.py` records why:
+    a font without it is not merely passed over when an application asks for
+    GB2312_CHARSET, it is silently replaced. Tofu on the GBK extensions costs
+    less than being unselectable.
     """
     return gb2312_codepoints() | _TABULAR
 

@@ -41,6 +41,20 @@ AVG_CHAR_WIDTH = 128
 #   17px+   GRIDFIT|DOGRAY  outlines with antialiasing
 GASP_RANGES = {8: 0x02, 16: 0x01, 0xFFFF: 0x03}
 
+# There is deliberately no second ladder for hinted builds.
+#
+# An earlier version had one, written to keep ttfautohint away from the small
+# sizes where it filled in counters. Chlorophytum replaced it and
+# that reason went with it; measured, hinting neither helps nor harms one-bit
+# rendering enough to justify a different ladder. What is left is a style
+# decision - a fallback glyph between 9 and 16px renders in one bit so that it
+# matches the strikes around it - and that decision is the same whether or not
+# the font carries instructions.
+#
+# Keeping one ladder also makes `--hinting` change exactly one thing. A build
+# stripped back with `sbitgraft --strip` then renders like the released font
+# rather than merely holding the same outlines.
+
 # Smallest strike is 12px; below that there is nothing to show.
 LOWEST_REC_PPEM = 8
 
@@ -271,6 +285,7 @@ def apply_post(font: TTFont, spec: FontSpec) -> None:
 
 
 def apply_gasp(font: TTFont) -> None:
+    """Write the rendering ladder. One ladder; see GASP_RANGES."""
     gasp = newTable("gasp")
     gasp.version = 1
     gasp.gaspRange = dict(GASP_RANGES)

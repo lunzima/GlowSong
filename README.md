@@ -14,10 +14,12 @@ PANOSE 两个标志位。ASCII 一律半角（0.5 em），全角一律 1 em，�
 
 | 目录 / 文件 | 内容 | 许可 |
 |---|---|---|
-| `glowsong-base-1.001/` | 轮廓字体、Ext A、矢量管线源码 | SIL OFL 1.1 |
-| `glowsong-bitmap-1.001/` | 点阵字体、五档 BDF 源码 | GPL v2 + 字体嵌入例外 |
-| `sbitgraft-1.001/` | 拼合工具，单个 C 文件 | MIT |
+| `glowsong-base-1.002/` | 轮廓字体、Ext A、矢量管线源码 | SIL OFL 1.1 |
+| `glowsong-bitmap-1.002/` | 点阵字体、五档 BDF 源码 | GPL v2 + 字体嵌入例外 |
+| `sbitgraft-1.002/` | 拼合工具，单个 C 文件 | MIT |
+| `LICENSE-MIT` | 字体 `fpgm` 内含的 hinting 运行时的许可 | MIT |
 | `65-glowsong.conf`、`check-fontconfig.sh` | fontconfig 配置与自查脚本 | CC0 1.0 |
+| `APPENDIX-toolkits.md` | 各桌面工具包行为的实测记录（英文） | CC0 1.0 |
 
 各目录下的 `README.md` 讲自己那一份怎么用。
 
@@ -26,9 +28,9 @@ PANOSE 两个标志位。ASCII 一律半角（0.5 em），全角一律 1 em，�
 需要一个 C99 编译器，无其他依赖。
 
 ```sh
-BASE=glowsong-base-1.001
-BITS=glowsong-bitmap-1.001
-GRAFT=sbitgraft-1.001
+BASE=glowsong-base-1.002
+BITS=glowsong-bitmap-1.002
+GRAFT=sbitgraft-1.002
 
 make -C "$GRAFT"
 
@@ -51,15 +53,34 @@ Linux：
 
 ```sh
 mkdir -p ~/.local/share/fonts ~/.config/fontconfig/conf.d
-cp GlowSong-GBK.ttc glowsong-base-1.001/GlowSongExtA-Regular.ttf \
+cp GlowSong-GBK.ttc glowsong-base-1.002/GlowSongExtA-Regular.ttf \
    ~/.local/share/fonts/
 cp 65-glowsong.conf ~/.config/fontconfig/conf.d/
 fc-cache -f
 ```
 
-`65-glowsong.conf` 不可省略：Debian 与 Ubuntu 默认关闭内嵌点阵，缺了它 12–16px
-不会走点阵。它同时把几个常见的旧宋体族名指向本字体，好让写死那些名字的老文档也
-能用。装完可跑 `sh check-fontconfig.sh` 自查。
+配置文件与 `fc-cache -f` 都不能省，它们管三件事。
+
+一是内嵌点阵的开关。配置在 12–16px 打开内嵌点阵、关掉抗锯齿，17px 以上反过来。
+这两项的默认值本来就对，但桌面环境与发行版常会改动；文件编号 65，排在
+`50-user.conf` 与 `51-local.conf` 之后，因此压得住用户配置与发行版的本地配置。
+
+二是等宽分类。fontconfig 扫描字体时按 advance 的种类推断 `spacing`：只有一种是
+`FC_MONO`（100），两种且恰好成倍是 `FC_DUAL`（90）。半宽 ASCII 配全宽汉字必然落在
+后者，Sarasa、思源等宽黑体同样如此。Pango 把 `FC_DUAL` 视为等宽，GTK 系因此无碍；
+Qt 系（含 TDE 的 TQt3）要求 `spacing` 不小于 100，缺了这个文件，等宽那一款就不会
+出现在它们的等宽字体列表里，不过按名字仍然选得到。
+
+这一点在字体内部无法修正。fontconfig 计算 `spacing` 时只数 advance，不读
+`post.isFixedPitch`，也不读 PANOSE；这两个字段本字体都已按等宽正确填写，Windows
+下的分类因此是好的。配置用一条扫描期规则改写该值，而字体列表建自扫描缓存，所以
+安装后必须跑 `fc-cache -f`，否则旧判定会留在缓存里。
+
+三是旧族名映射。配置把几个常见的旧宋体族名指向本字体，写死那些名字的老文档因此
+也能用。
+
+装完可跑 `sh check-fontconfig.sh` 自查，等宽分类也在检查项里。各桌面工具包的具体
+取舍与源码出处记在 `APPENDIX-toolkits.md`，打包者与提 bug 的人用得上。
 
 Windows：右键安装 TTC。点阵只在 GDI 下生效——DirectWrite 不读内嵌点阵，所以 UWP
 应用、新版 Office 与浏览器看到的是轮廓。
@@ -80,10 +101,9 @@ misc-fixed。
 
 ## 许可
 
-三个目录各自独立，许可见各自的 `LICENSE`；fontconfig 那两个文件是 CC0，全文见
-`LICENSE-CC0`，抄走改用不必署名。字体文件的 `name` 表里也带着各自的版权与许可
+三个目录各自独立，许可见各自的 `LICENSE`；顶层那三个文件（fontconfig 配置、自查
+脚本、工具包附录）是 CC0，全文见 `LICENSE-CC0`，抄走改用不必署名。字体文件的 `name` 表里也带着各自的版权与许可
 声明（name ID 0、13、14），点阵那侧的 BDF 则写在文件头的注释里。
 
 拼合出来的成品同时衍生自 OFL 与 GPL 两边的材料，而这两个许可对衍生作品的要求
-互斥，因此**拼合的结果请自用，不要再分发**。需要分发时分发这三个目录，让对方
-自己拼。
+互斥，因此拼合的结果请自用，不要再分发。需要分发时分发这三个目录，让对方自己拼。

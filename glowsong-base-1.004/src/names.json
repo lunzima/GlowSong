@@ -1,6 +1,6 @@
 {
   "_comment": "Localised family names and the legal records, keyed by PostScript name. Kept out of the source so the code stays pure ASCII. Language tags are Windows LCIDs. The monospace suffix stays ASCII 'Mono' even in the Chinese names, so that a font merged locally by sbitgraft - which cannot know the word in any other language - lands on exactly the same name table as the build here.",
-  "version": "1.002",
+  "version": "1.004",
   "vendor_id": "GSng",
   "project_url": "https://github.com/lunzima/GlowSong",
   "author": "The GlowSong Authors",

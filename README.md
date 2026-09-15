@@ -14,9 +14,9 @@ PANOSE 两个标志位。ASCII 一律半角（0.5 em），全角一律 1 em，�
 
 | 目录 / 文件 | 内容 | 许可 |
 |---|---|---|
-| `glowsong-base-1.003/` | 轮廓字体、Ext A、矢量管线源码 | SIL OFL 1.1 |
-| `glowsong-bitmap-1.003/` | 点阵字体、五档 BDF 源码 | GPL v2 + 字体嵌入例外 |
-| `sbitgraft-1.003/` | 拼合工具，单个 C 文件 | MIT |
+| `glowsong-base-1.004/` | 轮廓字体、Ext A、矢量管线源码 | SIL OFL 1.1 |
+| `glowsong-bitmap-1.004/` | 点阵字体、五档 BDF 源码 | GPL v2 + 字体嵌入例外 |
+| `sbitgraft-1.004/` | 拼合工具，单个 C 文件 | MIT |
 | `LICENSE-MIT` | 字体 `fpgm` 内含的 hinting 运行时的许可 | MIT |
 | `65-glowsong.conf`、`check-fontconfig.sh` | fontconfig 配置与自查脚本 | CC0 1.0 |
 | `APPENDIX-toolkits.md` | 各桌面工具包行为的实测记录（英文） | CC0 1.0 |
@@ -33,9 +33,9 @@ PANOSE 两个标志位。ASCII 一律半角（0.5 em），全角一律 1 em，�
 需要一个 C99 编译器，无其他依赖。
 
 ```sh
-BASE=glowsong-base-1.003
-BITS=glowsong-bitmap-1.003
-GRAFT=sbitgraft-1.003
+BASE=glowsong-base-1.004
+BITS=glowsong-bitmap-1.004
+GRAFT=sbitgraft-1.004
 
 make -C "$GRAFT"
 
@@ -58,7 +58,7 @@ Linux：
 
 ```sh
 mkdir -p ~/.local/share/fonts ~/.config/fontconfig/conf.d
-cp GlowSong-GBK.ttc glowsong-base-1.003/GlowSongExtA-Regular.ttf \
+cp GlowSong-GBK.ttc glowsong-base-1.004/GlowSongExtA-Regular.ttf \
    ~/.local/share/fonts/
 cp 65-glowsong.conf ~/.config/fontconfig/conf.d/
 fc-cache -f

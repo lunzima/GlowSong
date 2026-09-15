@@ -17,6 +17,15 @@
  *     cc -O2 -std=c99 -o sbitgraft sbitgraft.c
  *     sbitgraft [--mono] outline.ttf bitmap.otb output.ttf
  *     sbitgraft --pack output.ttc face.ttf [face.ttf ...]
+ *     sbitgraft --strip in.ttf out.ttf
+ *     sbitgraft --derive-mono in.ttf out.ttf
+ *
+ * `--derive-mono` is the name and fixed-pitch half of `--mono` on its own,
+ * for an outline that has no bitmap font to graft and is not going to get
+ * one: it renames the family and sets post.isFixedPitch and
+ * OS/2.panose.bProportion, and touches nothing else. hmtx never changes in
+ * either mode; a spacing that reads as monospace to fontconfig without
+ * moving a single advance is a job for a fontconfig rule, not this tool.
  *
  * Licence: MIT.
  */
@@ -806,9 +815,12 @@ static void usage(void)
             "usage: sbitgraft [--mono] [--strip] outline.ttf bitmap.otb out.ttf\n"
             "       sbitgraft --pack out.ttc face.ttf [face.ttf ...]\n"
             "       sbitgraft --strip in.ttf out.ttf\n"
+            "       sbitgraft --derive-mono in.ttf out.ttf\n"
             "\n"
-            "  --mono   rename the family and set the fixed-pitch flags\n"
-            "  --strip  remove hinting: fpgm, prep, cvt, glyph instructions\n");
+            "  --mono         rename the family and set the fixed-pitch flags\n"
+            "  --strip        remove hinting: fpgm, prep, cvt, glyph instructions\n"
+            "  --derive-mono  the name and fixed-pitch half of --mono, on an\n"
+            "                 outline alone; no bitmap font, no EBDT/EBLC\n");
 }
 
 static int pack(int argc, char **argv)
@@ -851,6 +863,22 @@ static int strip_only(int argc, char **argv)
     return 0;
 }
 
+/* `--derive-mono in out`. Reads one outline, applies the same two edits
+ * `--mono` applies on the way through a graft, and writes it back out. No
+ * bitmap font is asked for and none is possible to reach from here: `graft`
+ * is simply never called, so EBDT/EBLC cannot enter the file this way. */
+static int derive_mono_only(int argc, char **argv)
+{
+    Font font;
+
+    if (argc != 4) { usage(); return 2; }
+    font_read(&font, argv[2]);
+    rename_family(&font, " Mono", "Mono");
+    mark_monospace(&font);
+    font_write(&font, argv[3]);
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     Font outline, bitmap;
@@ -863,6 +891,8 @@ int main(int argc, char **argv)
      * more thing to do on the way through. */
     if (argc == 4 && strcmp(argv[1], "--strip") == 0)
         return strip_only(argc, argv);
+    if (argc == 4 && strcmp(argv[1], "--derive-mono") == 0)
+        return derive_mono_only(argc, argv);
 
     while (arg < argc && argv[arg][0] == '-') {
         if (strcmp(argv[arg], "--mono") == 0) mono = 1;

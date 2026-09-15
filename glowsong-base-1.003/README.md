@@ -12,8 +12,16 @@
 |---|---|
 | `GlowSongBase-Regular.ttf` | GBK 全集 |
 | `GlowSongGBBase-Regular.ttf` | GB2312 子集 |
+| `GlowSongBaseMono-Regular.ttf` | GBK 全集，等宽 |
+| `GlowSongGBBaseMono-Regular.ttf` | GB2312 子集，等宽 |
 | `GlowSongExtA-Regular.ttf` | CJK 扩展 A 的缺字回退，无需拼合 |
-| `src/` | 生成上面三个文件的矢量管线源码 |
+| `src/` | 生成上面五个文件的矢量管线源码 |
+
+等宽的两份用 `sbitgraft --derive-mono` 从对应的比例版派生：只改族名、
+`post.isFixedPitch`、PANOSE 三处，字形与度量逐字节不变。独立成文件而不是指
+望应用把点阵拼合后的族名认作等宽变体，是因为字体选择框读的是文件本身列出的
+family，不是 fontconfig 事后加的别名——后者 `fc-list` 能看到，但不会出现在
+选择框里。
 
 ## 安装
 

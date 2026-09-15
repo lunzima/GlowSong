@@ -14,23 +14,28 @@ PANOSE 两个标志位。ASCII 一律半角（0.5 em），全角一律 1 em，�
 
 | 目录 / 文件 | 内容 | 许可 |
 |---|---|---|
-| `glowsong-base-1.002/` | 轮廓字体、Ext A、矢量管线源码 | SIL OFL 1.1 |
-| `glowsong-bitmap-1.002/` | 点阵字体、五档 BDF 源码 | GPL v2 + 字体嵌入例外 |
-| `sbitgraft-1.002/` | 拼合工具，单个 C 文件 | MIT |
+| `glowsong-base-1.003/` | 轮廓字体、Ext A、矢量管线源码 | SIL OFL 1.1 |
+| `glowsong-bitmap-1.003/` | 点阵字体、五档 BDF 源码 | GPL v2 + 字体嵌入例外 |
+| `sbitgraft-1.003/` | 拼合工具，单个 C 文件 | MIT |
 | `LICENSE-MIT` | 字体 `fpgm` 内含的 hinting 运行时的许可 | MIT |
 | `65-glowsong.conf`、`check-fontconfig.sh` | fontconfig 配置与自查脚本 | CC0 1.0 |
 | `APPENDIX-toolkits.md` | 各桌面工具包行为的实测记录（英文） | CC0 1.0 |
 
 各目录下的 `README.md` 讲自己那一份怎么用。
 
+`glowsong-base` 里的等宽变体（`GlowSongBaseMono-Regular.ttf`、
+`GlowSongGBBaseMono-Regular.ttf`）不需要拼合，装上就能用——它们是从对应的比
+例版派生的独立文件，不依赖点阵，也不依赖下面这一节的工具。等宽 fontconfig
+分类靠 `65-glowsong.conf`，见该文件内的说明。
+
 ## 拼起来
 
 需要一个 C99 编译器，无其他依赖。
 
 ```sh
-BASE=glowsong-base-1.002
-BITS=glowsong-bitmap-1.002
-GRAFT=sbitgraft-1.002
+BASE=glowsong-base-1.003
+BITS=glowsong-bitmap-1.003
+GRAFT=sbitgraft-1.003
 
 make -C "$GRAFT"
 
@@ -53,7 +58,7 @@ Linux：
 
 ```sh
 mkdir -p ~/.local/share/fonts ~/.config/fontconfig/conf.d
-cp GlowSong-GBK.ttc glowsong-base-1.002/GlowSongExtA-Regular.ttf \
+cp GlowSong-GBK.ttc glowsong-base-1.003/GlowSongExtA-Regular.ttf \
    ~/.local/share/fonts/
 cp 65-glowsong.conf ~/.config/fontconfig/conf.d/
 fc-cache -f

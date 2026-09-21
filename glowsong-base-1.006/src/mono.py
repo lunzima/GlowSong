@@ -8,6 +8,11 @@ weight compensation.
 Narrow characters are *not* stretched. Uniform advances do not mean uniform ink -
 in a real monospace font `i` is narrower than `W`. Stretching `|` from 13 units
 to 128 just deforms it.
+
+The euro is reshaped here as well. It is half width on the same test as ASCII -
+CP936 carries it in a single byte, 0x80 - and left at the source's own
+proportion it would be 123 units wide in a 128-unit cell, a right bearing of
+one unit, and would meet its neighbour in `€0`. See `NON_ASCII_LATIN`.
 """
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.transformPen import TransformPen
@@ -18,6 +23,23 @@ from build import outline, strokes, vector
 
 HALF_WIDTH = vector.HALF_WIDTH
 ASCII_RANGE = range(0x20, 0x7F)
+
+# Half-width latin that is not ASCII, with the share of the cell its ink should
+# fill. Only the euro: CP936 has no other single-byte character outside ASCII,
+# and Python's cp936 codec cannot reach even this one, so it is named by hand
+# (see `charset.CP936_EXTRA`).
+#
+# The ratio is fixed instead of graded through `RATIO`. Those classes are
+# calibrated so that the *class average* lands where the reference font's ink
+# does, and the median that grade is measured against is an ASCII median;
+# admitting a 96th member moves six capitals by a unit (F K L Q S measured at
+# 1 unit each). A fixed ratio leaves every existing glyph byte-identical. 0.88
+# is the wide-symbol class, where `$` - the nearest thing to a euro in the set -
+# sits.
+NON_ASCII_LATIN: dict[int, float] = {0x20AC: 0.88}
+
+# Everything the latin source feeds into a half-width cell.
+LATIN_RANGE = tuple(ASCII_RANGE) + tuple(sorted(NON_ASCII_LATIN))
 
 MAX_FIT_ROUNDS = 4
 DEFAULT_RATIO = 0.82
@@ -138,7 +160,12 @@ def target_ink_width(ch: str, target: int = HALF_WIDTH,
 
 
 def _natural_widths(glyph_set, lookup) -> dict[str, float]:
-    """Ink width of each ASCII glyph as the source draws it."""
+    """Ink width of each ASCII glyph as the source draws it.
+
+    ASCII only, deliberately: these measurements set the class medians in
+    `class_shares`, and a non-ASCII member would move them. The euro takes a
+    fixed ratio instead - see `NON_ASCII_LATIN`.
+    """
     out: dict[str, float] = {}
     for cp in ASCII_RANGE:
         name = lookup.get(cp)
@@ -241,7 +268,10 @@ def _fit_one(glyph_set, name: str, limit: float, target: int,
 
 def fit_ascii(font: TTFont, target: int = HALF_WIDTH,
               compensate_stems: bool = True) -> int:
-    """Reshape the ASCII glyphs in place to a uniform advance. Returns the count.
+    """Reshape the half-width latin glyphs in place. Returns the count.
+
+    That is ASCII plus `NON_ASCII_LATIN`; both faces need it, because both give
+    ASCII and the euro the same advance.
 
     FontForge's condenseExtend, which should do this job, does nothing here: it
     needs hinting to identify stems and this project writes none. changeWeight
@@ -253,14 +283,17 @@ def fit_ascii(font: TTFont, target: int = HALF_WIDTH,
     shares = class_shares(_natural_widths(glyph_set, lookup))
     changed = 0
 
-    for cp in ASCII_RANGE:
+    for cp in LATIN_RANGE:
         name = lookup.get(cp)
         if name is None:
             continue
         if getattr(glyf[name], "numberOfContours", 0) <= 0:
             hmtx[name] = (target, 0)
             continue
-        limit = target_ink_width(chr(cp), target, shares)
+        if cp in NON_ASCII_LATIN:
+            limit = NON_ASCII_LATIN[cp] * target
+        else:
+            limit = target_ink_width(chr(cp), target, shares)
         glyf[name] = _fit_one(glyph_set, name, limit, target, compensate_stems)
         fitted = glyf[name]
         hmtx[name] = (target,

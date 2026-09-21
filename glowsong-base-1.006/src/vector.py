@@ -186,7 +186,9 @@ class SourceSet:
         Latin claims two ranges: printable ASCII, which is everything encoding
         to a single CP936 byte, and the fullwidth *alphanumerics*. A fullwidth A
         is the same letter as A, so drawing it from a second source would put two
-        designs of one letter in the font.
+        designs of one letter in the font. The euro arrives here the same way
+        ASCII does - CP936 puts it in a single byte too, 0x80, which is also why
+        `is_full_width` leaves it False.
 
         Everything else stays with Source Han, including the punctuation that
         shares the fullwidth block, Greek, Cyrillic and accented pinyin. They are
@@ -265,6 +267,10 @@ def is_full_width(cp: int) -> bool:
     CJK Ext A, which is Han and only reached CP936's successor GB18030; and the
     parts of the box drawing and block element ranges CP936 omits, which must
     match the width of their neighbours or TUI frames break apart.
+
+    The euro is the mirror case: CP936 gives it a byte, but Python's cp936 codec
+    does not decode that byte, so the test below raises and the character falls
+    through as half width - which is the right answer (see `charset`).
     """
     if 0x3400 <= cp <= 0x4DBF:
         return True

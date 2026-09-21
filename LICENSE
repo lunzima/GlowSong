@@ -7,14 +7,14 @@ Each part is under its own licence. Full texts are where this file says.
 Outline fonts
 -------------
 
-Directory: glowsong-base-1.005/
+Directory: glowsong-base-1.006/
 Files: GlowSongBase-Regular.ttf, GlowSongGBBase-Regular.ttf,
        GlowSongBaseMono-Regular.ttf, GlowSongGBBaseMono-Regular.ttf,
        GlowSongExtA-Regular.ttf, src/
 
 SIL Open Font License 1.1
 SPDX-License-Identifier: OFL-1.1
-Text: glowsong-base-1.005/LICENSE
+Text: glowsong-base-1.006/LICENSE
 
     Copyright 2026 The GlowSong Authors, with no Reserved Font Name.
     Portions copyright 2017-2024 Adobe, with Reserved Font Name 'Source'.
@@ -26,12 +26,12 @@ Text: glowsong-base-1.005/LICENSE
 Bitmap fonts
 ------------
 
-Directory: glowsong-bitmap-1.005/
+Directory: glowsong-bitmap-1.006/
 Files: GlowSongBitmap.otb, GlowSongGBBitmap.otb, src/
 
 GNU General Public License version 2, with the font embedding exception
 SPDX-License-Identifier: GPL-2.0-only WITH Font-exception-2.0
-Text: glowsong-bitmap-1.005/LICENSE
+Text: glowsong-bitmap-1.006/LICENSE
 
     Copyright 2026 The GlowSong Authors.
     Portions copyright 2004-2010 WenQuanYi Project Board of Trustees
@@ -44,11 +44,11 @@ The BDF files in src/ are the corresponding source under section 3.
 Merge tool
 ----------
 
-Directory: sbitgraft-1.005/
+Directory: sbitgraft-1.006/
 
 MIT
 SPDX-License-Identifier: MIT
-Text: sbitgraft-1.005/LICENSE
+Text: sbitgraft-1.006/LICENSE
 
     Copyright 2026 The GlowSong Authors.
 

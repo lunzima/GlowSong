@@ -27,7 +27,7 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables import ttProgram
 from fontTools.ttLib.tables._g_l_y_f import Glyph, GlyphCoordinates
 
-from build import outline, sources, strokes
+from build import catchup, outline, sources, strokes
 
 UPEM = 256
 FULL_WIDTH = UPEM
@@ -463,6 +463,9 @@ def build(src: SourceSet, codepoints, family: str = "GlowSong",
     for index, (cp, name) in enumerate(sorted(names.items()), 1):
         source, source_cp = src.resolve(cp)
         glyph = source.convert(source_cp, src.fit(cp), max_err, max_dev)
+        # The tiling block, carried to this project's cell and weight; see
+        # `catchup`. Everything else is the source's own drawing.
+        glyph = catchup.adjust(cp, glyph)
         advance, glyph = glyph_advance(src, cp, glyph)
         glyf[name] = glyph
         hmtx[name] = (advance, glyph.xMin if glyph.numberOfContours else 0)

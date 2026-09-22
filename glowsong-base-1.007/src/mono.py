@@ -12,34 +12,46 @@ to 128 just deforms it.
 The euro is reshaped here as well. It is half width on the same test as ASCII -
 CP936 carries it in a single byte, 0x80 - and left at the source's own
 proportion it would be 123 units wide in a 128-unit cell, a right bearing of
-one unit, and would meet its neighbour in `€0`. See `NON_ASCII_LATIN`.
+one unit, and would meet its neighbour in `€0`. See `EURO_RATIO`.
+
+The 92 Windows-1252 characters are half width on that same test and come
+through here too; 45 of them overrun the cell if they do not. See `RATIO`.
 """
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.transformPen import TransformPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 
-from build import outline, strokes, vector
+from build import charset, outline, strokes, vector
 
 HALF_WIDTH = vector.HALF_WIDTH
 ASCII_RANGE = range(0x20, 0x7F)
 
-# Half-width latin that is not ASCII, with the share of the cell its ink should
-# fill. Only the euro: CP936 has no other single-byte character outside ASCII,
-# and Python's cp936 codec cannot reach even this one, so it is named by hand
-# (see `charset.CP936_EXTRA`).
+# Half-width latin that is not ASCII and does not go through the class table
+# below, with the share of the cell its ink should fill.
 #
-# The ratio is fixed instead of graded through `RATIO`. Those classes are
-# calibrated so that the *class average* lands where the reference font's ink
-# does, and the median that grade is measured against is an ASCII median;
-# admitting a 96th member moves six capitals by a unit (F K L Q S measured at
-# 1 unit each). A fixed ratio leaves every existing glyph byte-identical. 0.88
-# is the wide-symbol class, where `$` - the nearest thing to a euro in the set -
-# sits.
-NON_ASCII_LATIN: dict[int, float] = {0x20AC: 0.88}
+# Only the euro is here. CP936 has no other single-byte character outside ASCII,
+# and Python's cp936 codec cannot reach even this one, so it is named by hand
+# (see `charset.CP936_EXTRA`). 0.88 is the wide-symbol class, where `$` - the
+# nearest thing to a euro in the set - sits.
+#
+# The ratio is fixed rather than graded because the class medians are ASCII
+# medians: admitting a 96th member moves six capitals by a unit (F K L Q S
+# measured at 1 unit each). A fixed ratio leaves every existing glyph
+# byte-identical.
+#
+# The Windows-1252 layer goes the other way - it *is* graded, through `RATIO`
+# below. A flat ratio cannot serve 92 characters spanning every case and class:
+# `À` has to land where `A` does and `é` where `e` does. What keeps that from
+# restyling ASCII is not a fixed ratio but where the medians come from
+# (`_natural_widths` measures ASCII alone), so a 92nd member of a class cannot
+# move them.
+EURO_RATIO: dict[int, float] = {0x20AC: 0.88}
 
-# Everything the latin source feeds into a half-width cell.
-LATIN_RANGE = tuple(ASCII_RANGE) + tuple(sorted(NON_ASCII_LATIN))
+# Everything the latin source feeds into a half-width cell. Everything in it is
+# half width by the byte-count test - see `charset.CP936_EXTRA`.
+LATIN_RANGE = (tuple(ASCII_RANGE) + tuple(sorted(EURO_RATIO))
+               + tuple(sorted(charset.NON_ASCII_LATIN)))
 
 MAX_FIT_ROUNDS = 4
 DEFAULT_RATIO = 0.82
@@ -140,6 +152,16 @@ _assign("abcdeghknopqrsuvxyz", 0.83, override=False)
 _assign("0123456789", 0.83, override=False)
 _assign("#$&*+-=~^_<>?/\\\"{}]", 0.88, override=False)
 
+# The Windows-1252 layer, by case, into the classes the ASCII above already
+# uses. None of these is in CP936, so none would otherwise reach a half-width
+# cell at all; left at the source's proportions 45 of the 92 run past the cell,
+# `™` by 105 units - it is 233 wide against a 128-unit advance. The measured
+# failures are in the commit that added them.
+_assign("ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞŒŠŸ", 0.88, override=False)
+_assign("âãäåæçëîïðñôõöøûýþÿßœš", 0.83, override=False)
+_assign("²³¹¼½¾", 0.83, override=False)
+_assign("¡¢£¥¦©ª«¬®¯´µ¶¸º»¿ƒˆ˜‚„†‡•‹›™", 0.88, override=False)
+
 # Ink is allowed this far past a CJK cell. Source Han draws a few CJK glyphs
 # slightly outside their em box (`zha` overhangs by one unit); CJK is never
 # repositioned, so that overhang is accepted rather than flagged.
@@ -164,7 +186,8 @@ def _natural_widths(glyph_set, lookup) -> dict[str, float]:
 
     ASCII only, deliberately: these measurements set the class medians in
     `class_shares`, and a non-ASCII member would move them. The euro takes a
-    fixed ratio instead - see `NON_ASCII_LATIN`.
+    fixed ratio instead - see `EURO_RATIO` - and the Windows-1252 layer is
+    graded by class but measured nowhere, which leaves those medians alone too.
     """
     out: dict[str, float] = {}
     for cp in ASCII_RANGE:
@@ -270,8 +293,10 @@ def fit_ascii(font: TTFont, target: int = HALF_WIDTH,
               compensate_stems: bool = True) -> int:
     """Reshape the half-width latin glyphs in place. Returns the count.
 
-    That is ASCII plus `NON_ASCII_LATIN`; both faces need it, because both give
-    ASCII and the euro the same advance.
+    That is everything in `LATIN_RANGE`: ASCII, the euro, and the Windows-1252
+    layer. Both faces need it, because both give the half-width latin the same
+    advance - so leaving any of it at the source's proportion scatters it across
+    the neighbouring cells.
 
     FontForge's condenseExtend, which should do this job, does nothing here: it
     needs hinting to identify stems and this project writes none. changeWeight
@@ -290,8 +315,8 @@ def fit_ascii(font: TTFont, target: int = HALF_WIDTH,
         if getattr(glyf[name], "numberOfContours", 0) <= 0:
             hmtx[name] = (target, 0)
             continue
-        if cp in NON_ASCII_LATIN:
-            limit = NON_ASCII_LATIN[cp] * target
+        if cp in EURO_RATIO:
+            limit = EURO_RATIO[cp] * target
         else:
             limit = target_ink_width(chr(cp), target, shares)
         glyf[name] = _fit_one(glyph_set, name, limit, target, compensate_stems)

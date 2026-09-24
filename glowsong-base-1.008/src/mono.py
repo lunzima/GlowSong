@@ -204,7 +204,7 @@ def _natural_widths(glyph_set, lookup) -> dict[str, float]:
 def class_shares(natural: dict[str, float]) -> dict[str, float]:
     """Each character's width as a multiple of its class ratio.
 
-    Measured against the class **median**, not its mean: a class is not a tidy
+    Measured against the class median, not its mean: a class is not a tidy
     group of letters - the 0.82 one holds the capitals together with `& - I / ?`
     and a mean would follow those outliers rather than the letters.
 

@@ -54,7 +54,7 @@ _TABULAR = frozenset(BOX_DRAWING) | frozenset(BLOCK_ELEMENTS)
 # Every constant below is here because a byte range cannot reach the character,
 # and each says which range.
 #
-# The euro is the first. CP936 carries it in a **single** byte, 0x80, but
+# The euro is the first. CP936 carries it in a single byte, 0x80, but
 # Python's cp936 codec rejects that byte instead of decoding it, so enumerating
 # the codec never reaches the character and nothing about it is implied by the
 # tables above. It has to be added to both builds explicitly.
@@ -66,8 +66,8 @@ _TABULAR = frozenset(BOX_DRAWING) | frozenset(BLOCK_ELEMENTS)
 # to a half cell already.
 EURO = 0x20AC
 
-# Windows-1252's non-ASCII letters and punctuation. CP936 has **no code point
-# for any of them**: the code page spent its one non-ASCII single byte on the
+# Windows-1252's non-ASCII letters and punctuation. CP936 has no code point
+# for any of them: the code page spent its one non-ASCII single byte on the
 # euro and carried nothing else there, and the twenty Latin-1 characters it does
 # carry - U+00A4, U+00A7, U+00A8, U+00B0, U+00B1, U+00B7, U+00D7, U+00F7 and the
 # twelve accented pinyin vowels - arrive through the tables above already. So

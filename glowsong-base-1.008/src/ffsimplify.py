@@ -5,12 +5,12 @@ mergelines suit Song especially well: its strokes are already axis-aligned, so
 snapping near-axis lines exactly onto the axes both removes points and lines
 the strokes up with the pixel grid.
 
-**It also misfits glyphs, and the fit is checked per glyph.** Each glyph is
+It also misfits glyphs, and the fit is checked per glyph. Each glyph is
 offered a ladder of fits, loosest first, and keeps the first one that stays
 within tolerance of the outline it came in with; failing all of them it keeps
 that outline unsimplified.
 
-**The check is a rendered comparison, not a bounding box.** An earlier version
+The check is a rendered comparison, not a bounding box. An earlier version
 compared boxes and asked only whether the ink had moved outward. That check is
 blind to the damage that actually happens: a shallow arch flattens towards a
 polygon and a hook at the foot of a glyph slides, and through all of it the box
@@ -21,8 +21,8 @@ the box check rejected almost nothing. So both outlines are rendered unhinted
 at one pixel to the unit and compared. The box check is kept as well - a thin spike costs little area but is
 worth rejecting.
 
-**The comparison is made at two scales, and the local one is the one that
-matters.** Averaging a difference over a whole glyph dilutes anything confined
+The comparison is made at two scales, and the local one is the one that
+matters. Averaging a difference over a whole glyph dilutes anything confined
 to one part of it. The sibling project found this the hard way: a glyph whose
 foot the eye read as bent came to 0.78% over the glyph, under a 1% check, while
 the worst eighth-em window in it had changed by 11.75%. Here the same check
@@ -30,13 +30,13 @@ finds 72.4% of glyphs carrying a window over 3% at the loose bound, against a
 mean of 1.6% over the glyph. The whole-glyph figure is kept for fits that drift
 everywhere at once, and it does still turn down fits the local check passes.
 
-**A ladder beats simply tightening the bound.** The damage is uneven, so a
+A ladder beats simply tightening the bound. The damage is uneven, so a
 uniform bound pays everywhere for a fault that is concentrated. Measured over a
 1,524-glyph sample, the ladder holds every glyph inside both tolerances while
 taking 63% of them at the middle rung and sending only 1% back to their
 originals; no single bound does that.
 
-**This is the expensive correction.** Unchecked at 4.0 the pass took glyf to
+This is the expensive correction. Unchecked at 4.0 the pass took glyf to
 89.0% of what it was given; checked at both scales it takes it to 95.0%. Six
 points of the saving were being bought with damage, and giving that up is the
 right trade - but it is worth recording that this step is no longer the 11% win
@@ -47,11 +47,11 @@ segment is `forcelines` and `choosehv` snapping it onto the axis, which is
 independent of the error bound. Those glyphs fall through the whole ladder and
 keep their original outlines, which is the right answer for them.
 
-**Dropping flags is not the answer, which is worth recording because it is the
-obvious first guess.** Without `forcelines` the worst bulge gets six times worse
+Dropping flags is not the answer, which is worth recording because it is the
+obvious first guess. Without `forcelines` the worst bulge gets six times worse
 - 156 units - and the file is no smaller.
 
-**FontForge's output font is not used.** Only `glyf` is transplanted back, by
+FontForge's output font is not used. Only `glyf` is transplanted back, by
 codepoint. FontForge inserts `.null` and `nonmarkingreturn`, disturbing the
 glyph order; downgrades `post` to format 2, putting glyph names back on disk;
 and adds `FFTM` and `GDEF`. Transplanting keeps the table layout ours.
@@ -228,13 +228,13 @@ def _deviation(reference, candidate, cell: int) -> tuple[float, float]:
     The second is the most that any one `cell`-sized window of the image
     changed, as a percentage of that window's own area.
 
-    **The second exists because the first hides exactly the damage that gets
-    noticed.** 慧 has fifteen strokes and its foot is a fifth of its ink, so a
+    The second exists because the first hides exactly the damage that gets
+    noticed. 慧 has fifteen strokes and its foot is a fifth of its ink, so a
     plainly bent foot came to 0.78% over the glyph and passed a 1% check; the
     worst window in it had changed by 11.75%. Averaging over a glyph dilutes
     anything confined to one component by as much as twenty-five times.
 
-    **The window is scored against its area, not against its ink.** Dividing by
+    The window is scored against its area, not against its ink. Dividing by
     the ink in the window puts a vanishing denominator under a sparse corner:
     tried, it reported a glyph that looked untouched at 12.5% because two grey
     levels of noise sat over almost no ink. Skipping sparse windows instead
@@ -321,7 +321,7 @@ def simplify(
     local one passed, and the local one is the only thing that sees damage
     confined to one component.
 
-    `hmtx`'s lsb **must** be resynced afterwards, and this does it. FontForge
+    `hmtx`'s lsb must be resynced afterwards, and this does it. FontForge
     moves contour bounds - `zo` in hiragana had its xMin go from 25 to 13 -
     while the old lsb stays behind. The spec says lsb equals xMin, and when they
     disagree fontTools shifts the whole glyph by the difference on draw: that

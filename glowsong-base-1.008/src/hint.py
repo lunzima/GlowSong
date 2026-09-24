@@ -1,13 +1,13 @@
 """TrueType hinting, through Chlorophytum.
 
-**Why this exists.** Below 17px the strikes do the drawing and hinting never
+Why this exists. Below 17px the strikes do the drawing and hinting never
 runs. At 17px the strikes stop and the outlines take over, and a Song face's
 horizontal strokes are about 9 units at upem 256 - half a pixel at 17ppem.
 Antialiased, that lands as a mid-grey line where the 16px strike above it drew
 solid black.
 
-**Chlorophytum rather than ttfautohint, decided on shape rather than on
-contrast.** ttfautohint's `-a sss` makes the strokes far blacker and was
+Chlorophytum rather than ttfautohint, decided on shape rather than on
+contrast. ttfautohint's `-a sss` makes the strokes far blacker and was
 picked for that at first. Measured against the shape the outline actually
 describes - the same glyph rendered at eight times the size and box-reduced -
 it is the least faithful of the three options and wrecks four times as many
@@ -18,20 +18,20 @@ size tried, and more faithful than no hinting at all.
 Blur is the price and it is worth paying. A blurred glyph with the right
 structure can be read; a crisp glyph with the wrong structure misleads.
 
-**The upstream configuration is used unmodified.** An earlier attempt tuned
+The upstream configuration is used unmodified. An earlier attempt tuned
 `EmBox` to this font's own design and measured better - against the contrast
 metric that turned out to be the wrong one. By shape, the stock configuration
 wins at 17 and 18px, the two sizes that matter most here, so the tuning is
 dropped rather than kept for its own sake.
 
-**Two tools, split by codepoint.** Chlorophytum's passes cover ideographs,
+Two tools, split by codepoint. Chlorophytum's passes cover ideographs,
 hangul and kana; the letters go to ttfautohint. Neither tool can do both.
 Putting Latin through Chlorophytum's ideograph analyser takes a fifth of `g`'s
 ink away, because that analyser has an ideograph's em box and no blue zones for
 a baseline, an x-height or a descender. Putting ideographs through ttfautohint
 is worse still.
 
-**The split is upstream's, and so is the reason it works.** The two cannot
+The split is upstream's, and so is the reason it works. The two cannot
 share a font by stacking: run one after the other and the ideographs come out
 unrecognisable. What works is hinting each side in its own font and merging -
 and the merge needs no renumbering, because a single `instruct` invocation
@@ -44,7 +44,7 @@ joint invocation breaking the ideographs too. It had a stale configuration
 installed beside the toolchain, and was comparing outputs of two different
 configurations.
 
-**Runs before the strikes are attached.** Chlorophytum writes the font through
+Runs before the strikes are attached. Chlorophytum writes the font through
 ot-builder, which does not carry EBDT and EBLC across.
 
 Needs ttfautohint, and Node with a set of npm packages, all inside WSL. Without them the step is skipped and the font ships
@@ -165,8 +165,8 @@ UNHINTED_RANGES = (
     (0x2500, 0x25FF),   # box drawing, block elements, geometric shapes
 )
 
-# **Two more, and they are classes rather than ranges because that is how they
-# fail.** Every inked codepoint outside CJK, kana and Hangul was swept at
+# Two more, and they are classes rather than ranges because that is how they
+# fail. Every inked codepoint outside CJK, kana and Hangul was swept at
 # 12/16/22px, hinted against bare; grouped by what the character *is* - read
 # off its own Unicode name - rather than by which block it sits in:
 #
@@ -181,11 +181,11 @@ UNHINTED_RANGES = (
 # on a shape: a thin isolated bar or mark, exactly what it also failed on in
 # the tiling block. Both are held out for now.
 #
-# **Held out, not ruled out.** This says the one model available *today* is a
+# Held out, not ruled out. This says the one model available *today* is a
 # net loss on these two shapes at these three sizes; it does not say they
 # cannot be hinted. Anyone bringing a hinter built for them should read this as
 # the measurements to beat, not as a decision that they are unhintable.
-# **The rule is whole classes, not points.** A codepoint is held out only as a
+# The rule is whole classes, not points. A codepoint is held out only as a
 # member of one of the classes below; `UNHINTED_SYMBOLS` is generated from them
 # and a test asserts the two agree in both directions, so nobody can add a
 # single codepoint to the list without holding out the class it belongs to.
@@ -230,7 +230,7 @@ def class_members(codepoints) -> tuple[int, ...]:
 def hold_out_faults(codepoints, is_bare=None) -> list[str]:
     """Classes held out a member at a time, as messages.
 
-    **A class is held out whole or not at all.** Holding out the two members
+    A class is held out whole or not at all. Holding out the two members
     that measured worst and leaving their neighbours hinted would render one
     bar black and the bar beside it grey - the inconsistency this whole line of
     work exists to remove - and it is what a list built by adding points
@@ -451,7 +451,18 @@ def apply(font: TTFont, workdir: Path | None = None,
     `LETTER_RANGES` states the division; the module docstring says why there
     has to be one.
 
-    **The two `instruct` runs must be one invocation.** That is what makes the
+    The configuration's coverage pass has to leave the letters alone. Both
+    pieces go to one `instruct` invocation, so a pass whose range covers them
+    overrides what ttfautohint wrote for them - and the module docstring says
+    what that costs. `hcfg.json` subtracts `LETTER_RANGES` for that reason, the
+    same way it subtracts the blocks the three upstream passes own.
+    `tests/test_hinting_coverage.py` holds the two halves together. Measured on
+    a build that had the hole open: every Latin, Greek and Cyrillic glyph came
+    back carrying the ideograph analyser's program shape instead of
+    ttfautohint's, and the ten digits stopped agreeing with each other on
+    height and bottom edge at 9 of the 10 sizes swept.
+
+    The two `instruct` runs must be one invocation. That is what makes the
     pieces mergeable: it lays out a single function and CVT numbering across
     every output, so an ideograph's program reads the same CVT entries in the
     merged font that it read on its own. Run separately, each piece numbers

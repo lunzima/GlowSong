@@ -5,13 +5,13 @@ vertical stems by s while leaving horizontals untouched, so the latin ends up
 lighter than the CJK beside it. Compensation moves x only, which is why the
 horizontals survive: a horizontal edge's normal has no horizontal component.
 
-The compensation amount is computed **per edge**. Stroke weights inside one
+The compensation amount is computed per edge. Stroke weights inside one
 glyph differ by a factor of two - Song's `N` has 9-unit stems against a 26-unit
 diagonal - so no single amount can serve both. Two earlier approaches failed
 for that reason: computing from the stems left diagonals thin, and scaling the
 amount up for diagonal-heavy characters also scaled up that glyph's own stems.
 
-Everything here assumes **counter-clockwise outer contours**. `_thicken_dx`'s
+Everything here assumes counter-clockwise outer contours. `_thicken_dx`'s
 "outward" direction flips with the winding, so a clockwise source would have its
 strokes thinned rather than thickened. Sources are normalised on the way in, see
 `vector.Source.reverse_contours`.
@@ -84,7 +84,7 @@ def _probe(contours: list[Contour], ci: int, ei: int,
     on the other the ray finds nothing at all and the compensation drops to
     zero - measured as `M`'s stems crushed to 10% of their width.
 
-    A hit only counts when the edge it lands on runs roughly **anti-parallel**
+    A hit only counts when the edge it lands on runs roughly anti-parallel
     to the edge the ray started from, `(ux, uy)`. The two flanks of a stroke
     always do, whichever contour each belongs to, because they are traversed in
     opposite directions. A ray that escapes across a counter or down the inside
@@ -322,7 +322,7 @@ def restore_stroke_widths(contours: list[Contour], scale: float,
     is `(t - t') / 2`, i.e. `t' * (1 - r) / (2r)`. Dropping that `/r` halves the
     correction - measured as `H`'s stems going 22 -> 12 and only back to 16.
 
-    Thickness is pooled **per chain**, as a length-weighted median, not taken
+    Thickness is pooled per chain, as a length-weighted median, not taken
     edge by edge. A ray need not cross the stroke it started from: a stem flank
     probed at crossbar height measures the crossbar, reading 61 on `H` and 63 at
     the top of `Z`'s diagonal, and compensating from that pushes the outline out

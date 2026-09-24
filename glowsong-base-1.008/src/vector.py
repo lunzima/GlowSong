@@ -208,7 +208,7 @@ class SourceSet:
         Only glyphs drawn to *latin* proportions need it: they fill about half
         the cell and, left where the source put them, jam against its left edge.
 
-        **CJK punctuation must not be centred.** Chinese sets the comma, period,
+        CJK punctuation must not be centred. Chinese sets the comma, period,
         ideographic comma, colon and semicolon in the left half of the cell and
         leaves the right half empty; that is what makes runs of punctuation and
         line breaking come out right. Centring them moved the ideographic full
@@ -409,7 +409,7 @@ def refit_full_width(font: TTFont, src: "SourceSet") -> list[int]:
 def gdi_advance(units: int, ppem: int, upem: int = UPEM) -> int:
     """An advance in font units as GDI rounds it for a given pixel size.
 
-    GDI lays text out from `hmtx`, **not** from the advance stored in
+    GDI lays text out from `hmtx`, not from the advance stored in
     `EBDT`/`EBLC`, so an embedded bitmap whose advance disagrees with this is
     drawn into a cell of the wrong width: too narrow and the neighbours overlap,
     too wide and they drift apart. Measured through `GetCharWidth32W` (see

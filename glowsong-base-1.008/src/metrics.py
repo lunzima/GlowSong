@@ -195,7 +195,7 @@ def ink_extent(font: TTFont) -> tuple[int, int]:
 def win_metrics(font: TTFont) -> tuple[int, int, int]:
     """Compute (usWinAscent, usWinDescent, lineGap).
 
-    **The win metrics must cover every bit of ink**, because Windows clips to
+    The win metrics must cover every bit of ink, because Windows clips to
     them. Measured casualties otherwise: descenders reaching -71, accented
     Cyrillic and box-drawing verticals reaching 240.
 

@@ -553,7 +553,7 @@ static void glyph_instructions(const u8 *g, u32 len, u32 *at, u32 *count)
  *
  * Offsets in a short loca are stored halved, so there each glyph has to start
  * on an even byte and the padding below is what keeps that true once glyphs
- * shrink. **A long loca gets no padding**, and that is deliberate: glyphs
+ * shrink. A long loca gets no padding, and that is deliberate: glyphs
  * arrive already padded to a four-byte boundary, a reader tolerates up to
  * three bytes of slack past the end of a glyph, and one more pad byte is
  * exactly enough to push a glyph that had three over the line. */
